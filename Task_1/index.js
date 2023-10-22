@@ -52,29 +52,26 @@ function sortArr(value) {
     if (inputValue === "exit") {
       process.stdin.pause();
     } else {
-      if (inputValue === "1") {
-        sortByName(value);
-        return;
+      switch (inputValue) {
+        case "1":
+          sortByName(value);
+          break;
+        case "2":
+          sortNumberSmall(value);
+          break;
+        case "3":
+          sortNumberBig(value);
+          break;
+        case "4":
+          sortByQuantity(value);
+          break;
+        case "5":
+          sortByUnique(value);
+          break;
+        default:
+          console.log("You are Enter wrong number.");
+          break;
       }
-      if (inputValue === "2") {
-        sortNumberSmall(value);
-        return;
-      }
-
-      if (inputValue === "3") {
-        sortNumberBig(value);
-        return;
-      }
-      if (inputValue === "4") {
-        sortByQuantity(value);
-        return;
-      }
-
-      if (inputValue === "5") {
-        sortByUnique(value);
-        return;
-      }
-      return console.log("You are Enter wrong number");
     }
   });
 }
