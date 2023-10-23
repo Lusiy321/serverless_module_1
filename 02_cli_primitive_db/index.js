@@ -41,7 +41,7 @@ async function search() {
       message: "Enter the user's name you wanna find in DB: ",
     },
   ]);
-  return search;
+  return search.toLowerCase();
 }
 
 async function UserQuestions() {
