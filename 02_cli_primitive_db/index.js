@@ -12,8 +12,36 @@ async function db() {
   ]);
   if (answer.agreement === true) {
     const readFile = fs.readFileSync("db.json", "utf8");
-    console.log(readFile);
+    const find = await search();
+    const data = JSON.parse(readFile);
+    if (find.user.length > 0) {
+      const results = [];
+
+      for (const item of data) {
+        if (item.user === find.user) {
+          results.push(item);
+        }
+      }
+
+      return console.log(...results);
+    } else {
+      console.log("User not found");
+      return process.exit(0);
+    }
+  } else {
+    return process.exit(0);
   }
+}
+
+async function search() {
+  const search = await inquirer.prompt([
+    {
+      type: "input",
+      name: "user",
+      message: "Enter the user's name you wanna find in DB: ",
+    },
+  ]);
+  return search;
 }
 
 async function UserQuestions() {
@@ -24,7 +52,10 @@ async function UserQuestions() {
       message: "Enter the user's name. To cancel press ENTER: ",
       validate: (input) => {
         if (input.trim() === "") {
-          return db();
+          db();
+          return;
+        } else {
+          return true;
         }
       },
     },
