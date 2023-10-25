@@ -47,6 +47,7 @@ if (data.chatId !== null) {
   program.version("1.0.0").description("Telegram Console Sender");
   program
     .command("send-message <message>")
+    .alias("m")
     .description("Send text message ")
     .action(async (message) => {
       await bot.sendMessage(data.chatId, message);
@@ -55,6 +56,7 @@ if (data.chatId !== null) {
 
   program
     .command("send-photo <photoPath>")
+    .alias("p")
     .description("Send photo")
     .action(async (photoPath) => {
       const photo = fs.readFileSync(photoPath);
