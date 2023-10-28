@@ -1,4 +1,5 @@
 # compiled output
+05_Telegram_bot_exchange/node_modules
 04_Telegram_bot_weather/node_modules
 02_cli_primitive_db/node_modules
 03_cli_telegram_console_sender/node_modules
