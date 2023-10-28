@@ -7,15 +7,21 @@ const bot = new TelegramBot(token, { polling: true });
 
 const apiKey = "0d7f0074167484aea1ac4b73fdfcf8db";
 const city = "Kyiv";
+let interval = 3;
+console.log("Bot started");
 
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, "Choose a weather forecast interval:", {
-    reply_markup: {
-      keyboard: [["Forecast in Kyiv"]],
-      resize_keyboard: true,
-    },
-  });
+  bot.sendMessage(
+    chatId,
+    "Hello! Clik to the button 'Forecast in Kyiv' and choose a weather forecast interval on keyboard.",
+    {
+      reply_markup: {
+        keyboard: [["Forecast in Kyiv"]],
+        resize_keyboard: true,
+      },
+    }
+  );
 });
 
 bot.onText(/Forecast in Kyiv/, (msg) => {
@@ -30,37 +36,45 @@ bot.onText(/Forecast in Kyiv/, (msg) => {
 
 bot.onText(/3 hours/, (msg) => {
   sendWeather(msg, 3);
+  weatherUpdate(msg, 3);
 });
 
 bot.onText(/6 hours/, (msg) => {
   sendWeather(msg, 6);
+  interval = 6;
+  weatherUpdate(msg, 6);
 });
 
-function sendWeather(msg, interval) {
+function sendWeather(msg, int) {
   const chatId = msg.chat.id;
   const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
 
-  axios
-    .get(apiUrl)
-    .then((response) => {
-      const forecasts = response.data.list.filter(
-        (item, index) => index % (interval / 3) === 0
-      );
+  try {
+    axios.get(apiUrl).then((response) => {
+      const forecasts = response.data.list;
+      const weather = forecasts[0];
 
-      let message = `Weather forecast for a ${city} every ${interval} hours:\n\n`;
-      forecasts.forEach((forecast) => {
-        const date = new Date(forecast.dt * 1000);
-        const temp = forecast.main.temp;
-        const description = forecast.weather[0].description;
+      const date = new Date(weather.dt * 1000);
+      const temp = weather.main.temp;
+      const tempCel = (temp - 273.15).toFixed(0);
+      const description = weather.weather[0].description;
 
-        message += `Date: ${date.toISOString()}\n`;
-        message += `Temperature: ${temp}°C\n`;
-        message += `Description: ${description}\n\n`;
-      });
+      const message =
+        `Current weather in ${city}:\n\n` +
+        `Temperature: ${tempCel}°C\n` +
+        `Date: ${date.toISOString()}\n` +
+        `Description: ${description}\n`;
 
       bot.sendMessage(chatId, message);
-    })
-    .catch((e) => {
-      bot.sendMessage(chatId, `Error ${e}`);
     });
+  } catch (error) {
+    bot.sendMessage(chatId, `Error: ${error.message}`);
+  }
+}
+
+function weatherUpdate(msg, interval) {
+  setTimeout(() => {
+    sendWeather(msg, interval);
+    weatherUpdate(msg, interval);
+  }, interval * 60 * 60 * 1000);
 }
