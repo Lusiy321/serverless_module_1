@@ -7,7 +7,7 @@ const token = "6929875979:AAFby2qtxXuOceiZzH3j8cpuv_vZbG75IkM";
 const bot = new TelegramBot(token, { polling: true });
 const cache = new NodeCache({ stdTTL: 300 });
 const apiKey = "0d7f0074167484aea1ac4b73fdfcf8db";
-const city = "Kyiv";
+const city = "Kryvyi Rih";
 
 console.log("Bot started");
 
