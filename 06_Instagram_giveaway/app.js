@@ -5,20 +5,20 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-function readUsernamesFromFile(filePath) {
+function readFile(filePath) {
   const data = fs.readFileSync(filePath, "utf-8");
-  const usernames = data.trim().split("\n");
-  return [...new Set(usernames)];
+  const words = data.trim().split("\n");
+  return [...new Set(words)];
 }
 
 function uniqueValues() {
-  const uniqueUsernames = new Set();
+  const uniqueWords = new Set();
   for (let i = 0; i <= 19; i++) {
     const filePath = path.join(__dirname, `words/out${i}.txt`);
-    const usernames = readUsernamesFromFile(filePath);
-    usernames.forEach((username) => uniqueUsernames.add(username));
+    const words = readFile(filePath);
+    words.forEach((word) => uniqueWords.add(word));
   }
-  return uniqueUsernames.size;
+  return uniqueWords.size;
 }
 
 async function existInAllFiles() {
@@ -27,63 +27,60 @@ async function existInAllFiles() {
   );
 
   try {
-    const promises = filePaths.map(readUsernamesFromFile);
-    const usernamesArrays = await Promise.all(promises);
+    const promises = filePaths.map(readFile);
+    const wordsArrays = await Promise.all(promises);
 
-    if (usernamesArrays.length === 0) {
+    if (wordsArrays.length === 0) {
       return 0;
     }
 
-    const [firstUsernames, ...restUsernames] = usernamesArrays;
+    const [firstWords, ...restWords] = wordsArrays;
 
-    const allUsernames = new Set(firstUsernames);
+    const allWords = new Set(firstWords);
 
-    for (const usernames of restUsernames) {
-      const usernamesSet = new Set(usernames);
-      for (const existingUsername of allUsernames) {
-        if (!usernamesSet.has(existingUsername)) {
-          allUsernames.delete(existingUsername);
+    for (const words of restWords) {
+      const wordsSet = new Set(words);
+      for (const existingWords of allWords) {
+        if (!wordsSet.has(existingWords)) {
+          allWords.delete(existingWords);
         }
       }
     }
 
-    return allUsernames.size;
+    return allWords.size;
   } catch (error) {
-    console.error(`Error in existInAllFiles: ${error.message}`);
+    console.error(`Error: ${error.message}`);
     return 0;
   }
 }
 
 function existInAtleastTen() {
-  const usernameCountMap = new Map();
+  const wordsMap = new Map();
   for (let i = 0; i <= 19; i++) {
     const filePath = path.join(__dirname, `words/out${i}.txt`);
-    const usernames = readUsernamesFromFile(filePath);
-    usernames.forEach((username) => {
-      if (usernameCountMap.has(username)) {
-        usernameCountMap.set(username, usernameCountMap.get(username) + 1);
+    const words = readFile(filePath);
+    words.forEach((word) => {
+      if (wordsMap.has(word)) {
+        wordsMap.set(word, wordsMap.get(word) + 1);
       } else {
-        usernameCountMap.set(username, 1);
+        wordsMap.set(word, 1);
       }
     });
   }
-  const countAtleastTen = [...usernameCountMap.values()].filter(
+  const countAtleastTen = [...wordsMap.values()].filter(
     (count) => count >= 10
   ).length;
   return countAtleastTen;
 }
 
 console.time("uniqueValues");
-console.log("Уникальные имена во всех файлах:", uniqueValues());
+console.log("Unique names of all files:", uniqueValues());
 console.timeEnd("uniqueValues");
 
 console.time("existInAllFiles");
-console.log("Имена, встречающиеся во всех 20 файлах:", await existInAllFiles());
+console.log("All exist names of 20 files:", await existInAllFiles());
 console.timeEnd("existInAllFiles");
 
 console.time("existInAtleastTen");
-console.log(
-  "Имена, встречающиеся как минимум в 10 файлах:",
-  existInAtleastTen()
-);
+console.log("Names in at least 10 files:", existInAtleastTen());
 console.timeEnd("existInAtleastTen");
